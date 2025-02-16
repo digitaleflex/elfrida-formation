@@ -96,6 +96,6 @@ Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 
 ### Demontration
 
-![alt link](https://www.awesomescreenshot.com/video/36666061?key=f28e1ca78066f39f1bd3ed4886f8670b)
+https://www.awesomescreenshot.com/video/36666061key=f28e1ca78066f39f1bd3ed4886f8670b
 
 
