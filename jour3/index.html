@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant - Commandes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container text-center mt-5">
+        <h1>Bienvenue au restaurant</h1>
+        <a href="commande.html" class="btn btn-primary mt-3">Passer une commande</a>
+        <a href="commandes.html" class="btn btn-secondary mt-3">Voir les commandes</a>
+    </div>
+</body>
+</html>
+
+-- Formulaire de commande
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passer une commande</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Commander un plat</h2>
+        <form id="commandeForm">
+            <div class="mb-3">
+                <label for="nom" class="form-label">Nom</label>
+                <input type="text" id="nom" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" id="email" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="produit" class="form-label">Choisissez un plat</label>
+                <select id="produit" class="form-control">
+                    <option>Pizza</option>
+                    <option>Pâtes</option>
+                    <option>Salade</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Commander</button>
+        </form>
+    </div>
+</body>
+</html>
