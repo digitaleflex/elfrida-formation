@@ -19,8 +19,8 @@ Une application web permettant aux clients de passer des commandes en ligne et a
 
 1. **Cloner le projet**
    ```bash
-   git clone [url-du-projet]
-   cd [nom-du-projet]
+   git clone https://github.com/digitaleflex/elfrida-formation 
+   cd elfrid-formation/jour3
    ```
 
 2. **Configuration de la base de données**
@@ -30,8 +30,8 @@ Une application web permettant aux clients de passer des commandes en ligne et a
      ```php
      $host = 'localhost';
      $dbname = 'restaurant';
-     $username = 'votre_username';
-     $password = 'votre_password';
+     $username = 'root';
+     $password = '';
      ```
 
 3. **Configuration du serveur web**
