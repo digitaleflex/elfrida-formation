@@ -9,12 +9,16 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="<?php echo dirname($_SERVER['PHP_SELF']) == '/' ? '' : dirname($_SERVER['PHP_SELF']); ?>/css/style.css">
+    <link rel="stylesheet" href="<?php 
+    $depth = substr_count(dirname($_SERVER['PHP_SELF']), '/');
+    $prefix = str_repeat('../', $depth - 1);
+    echo $prefix; 
+    ?>css/style.css">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
         <div class="container">
-            <a class="navbar-brand" href="<?php echo dirname($_SERVER['PHP_SELF']) == '/' ? '' : dirname($_SERVER['PHP_SELF']); ?>/index.php">
+            <a class="navbar-brand" href="<?php echo $prefix; ?>index.php">
                 <i class="fas fa-blog me-2"></i>Mon Blog
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -23,22 +27,22 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="<?php echo dirname($_SERVER['PHP_SELF']) == '/' ? '' : dirname($_SERVER['PHP_SELF']); ?>/index.php">
+                        <a class="nav-link" href="<?php echo $prefix; ?>index.php">
                             <i class="fas fa-home me-1"></i>Accueil
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?php echo dirname($_SERVER['PHP_SELF']) == '/' ? '' : dirname($_SERVER['PHP_SELF']); ?>/articles.php">
+                        <a class="nav-link" href="<?php echo $prefix; ?>articles.php">
                             <i class="fas fa-newspaper me-1"></i>Articles
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?php echo dirname($_SERVER['PHP_SELF']) == '/' ? '' : dirname($_SERVER['PHP_SELF']); ?>/about.php">
+                        <a class="nav-link" href="<?php echo $prefix; ?>about.php">
                             <i class="fas fa-info-circle me-1"></i>À propos
                         </a>
                     </li>
                 </ul>
-                <form class="d-flex" action="<?php echo dirname($_SERVER['PHP_SELF']) == '/' ? '' : dirname($_SERVER['PHP_SELF']); ?>/articles.php" method="GET">
+                <form class="d-flex" action="<?php echo $prefix; ?>articles.php" method="GET">
                     <input class="form-control me-2" type="search" name="recherche" placeholder="Rechercher..." aria-label="Search">
                     <button class="btn btn-outline-light" type="submit"><i class="fas fa-search"></i></button>
                 </form>
