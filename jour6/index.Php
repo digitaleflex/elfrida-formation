@@ -51,15 +51,24 @@ $patientsList = Patient::getAll();
                             <td><?= $rdv['id'] ?></td>
                             <td>
                                 <?php 
-                                    // Trouver le nom du patient associé
                                     $patient = array_filter($patientsList, fn($p) => $p['id'] == $rdv['patient_id']);
-                                    echo reset($patient)['nom'] . ' ' . reset($patient)['prenom'];
+                                    $patient = reset($patient);
                                 ?>
+                                <?= $patient['nom'] . ' ' . $patient['prenom'] ?>
+                                <a href="src/controllers/patientController.php?delete=<?= $patient['id'] ?>" 
+                                   class="btn btn-danger btn-sm ms-2"
+                                   onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce patient ?')">
+                                    Supprimer le patient
+                                </a>
                             </td>
                             <td><?= $rdv['date_rdv'] ?></td>
                             <td><?= $rdv['heure_rdv'] ?></td>
                             <td>
-                                <a href="src/controllers/rdvController.php?delete=<?= $rdv['id'] ?>" class="btn btn-danger btn-sm">Supprimer</a>
+                                <a href="src/controllers/rdvController.php?delete=<?= $rdv['id'] ?>" 
+                                   class="btn btn-danger btn-sm"
+                                   onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce rendez-vous ?')">
+                                    Supprimer le RDV
+                                </a>
                             </td>
                         </tr>
                     <?php endforeach; ?>

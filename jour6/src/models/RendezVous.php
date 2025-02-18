@@ -18,5 +18,17 @@ class RendezVous {
             return false;
         }
     }
+
+    // Méthode pour supprimer un rendez-vous
+    public static function delete($id) {
+        global $pdo;
+        try {
+            $stmt = $pdo->prepare("DELETE FROM rendez_vous WHERE id = ?");
+            return $stmt->execute([$id]);
+        } catch (PDOException $e) {
+            echo 'Erreur lors de la suppression du rendez-vous : ' . $e->getMessage();
+            return false;
+        }
+    }
 }
 ?>
