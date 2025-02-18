@@ -5,12 +5,18 @@ RewriteBase /
 # RewriteCond %{HTTPS} off
 # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-# Gestion des erreurs
-ErrorDocument 404 /404.php
-ErrorDocument 500 /500.php
+# Gestion des erreurs avec chemins relatifs
+ErrorDocument 404 /jour5/404.php
+ErrorDocument 500 /jour5/500.php
 
 # Protection des fichiers sensibles
 <FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Protection des dossiers sensibles
+<FilesMatch "(^\.ht|\.env|config\.php|db\.php)">
     Order allow,deny
     Deny from all
 </FilesMatch>
@@ -31,11 +37,30 @@ ErrorDocument 500 /500.php
     ExpiresByType application/javascript "access plus 1 month"
 </IfModule>
 
-# Ajout du slash final aux dossiers
-RewriteCond %{REQUEST_FILENAME} -d
-RewriteRule ^(.*[^/])$ /$1/ [L,R=301]
-
-# Redirection des chemins incorrects vers la page 404
+# Gestion des URLs propres et redirection vers 404
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule . /404.php [L] 
+RewriteCond %{REQUEST_URI} !^/jour5/404\.php$
+RewriteCond %{REQUEST_URI} !^/jour5/500\.php$
+RewriteRule ^(.*)$ /jour5/404.php [L,QSA]
+
+# Empêcher l'accès direct aux fichiers PHP dans includes/
+RewriteRule ^includes/ - [F,L]
+
+# Empêcher le listage des répertoires
+Options -Indexes
+
+# Forcer le type de contenu pour les fichiers PHP
+AddType application/x-httpd-php .php
+
+# Headers de sécurité
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Ajout du slash final aux dossiers
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^(.*[^/])$ /$1/ [L,R=301] 
