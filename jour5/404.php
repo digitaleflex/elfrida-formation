@@ -22,13 +22,16 @@ $articles_suggeres = $stmt->fetchAll();
                 <p class="lead text-muted mb-5">
                     La page que vous recherchez semble avoir disparu dans le cyberespace...
                 </p>
-                <div class="error-actions d-flex justify-content-center gap-3">
-                    <a href="/index.php" class="btn btn-primary btn-lg">
+                <div class="error-actions d-flex flex-column flex-md-row justify-content-center gap-3">
+                    <a href="<?php echo dirname($_SERVER['PHP_SELF']); ?>/index.php" class="btn btn-primary btn-lg">
                         <i class="fas fa-home me-2"></i>Retour à l'accueil
                     </a>
-                    <a href="/articles.php" class="btn btn-outline-primary btn-lg">
+                    <a href="<?php echo dirname($_SERVER['PHP_SELF']); ?>/articles.php" class="btn btn-outline-primary btn-lg">
                         <i class="fas fa-newspaper me-2"></i>Voir les articles
                     </a>
+                    <button onclick="window.history.back()" class="btn btn-outline-secondary btn-lg">
+                        <i class="fas fa-arrow-left me-2"></i>Page précédente
+                    </button>
                 </div>
             </div>
 
@@ -48,7 +51,7 @@ $articles_suggeres = $stmt->fetchAll();
                                     </small>
                                 </div>
                                 <h3 class="h6 card-title">
-                                    <a href="/article.php?id=<?php echo $article['id']; ?>" 
+                                    <a href="<?php echo dirname($_SERVER['PHP_SELF']); ?>/article.php?id=<?php echo $article['id']; ?>" 
                                        class="text-decoration-none text-dark stretched-link">
                                         <?php echo htmlspecialchars($article['titre']); ?>
                                     </a>
@@ -69,9 +72,14 @@ $articles_suggeres = $stmt->fetchAll();
                         <p class="text-muted mb-3">
                             Si vous pensez qu'il s'agit d'une erreur, n'hésitez pas à nous contacter.
                         </p>
-                        <a href="mailto:support@example.com" class="btn btn-outline-primary">
-                            <i class="fas fa-envelope me-2"></i>Contacter le support
-                        </a>
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="mailto:support@example.com" class="btn btn-outline-primary">
+                                <i class="fas fa-envelope me-2"></i>Contacter le support
+                            </a>
+                            <a href="<?php echo dirname($_SERVER['PHP_SELF']); ?>/about.php" class="btn btn-outline-secondary">
+                                <i class="fas fa-info-circle me-2"></i>À propos
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -137,6 +145,22 @@ $articles_suggeres = $stmt->fetchAll();
 .btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .error-number .display-1 {
+        font-size: 4rem;
+    }
+    
+    .error-actions {
+        flex-direction: column;
+    }
+    
+    .btn-lg {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
 }
 </style>
 

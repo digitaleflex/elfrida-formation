@@ -7,8 +7,7 @@
                     <h5 class="mb-3">À propos</h5>
                     <p class="mb-0"><?php echo SITE_DESCRIPTION; ?></p>
                     <div class="mt-3">
-                        <a href="<?php echo dirname($_SERVER['PHP_SELF']) === '/' ? '' : dirname($_SERVER['PHP_SELF']); ?>/about.php" 
-                           class="btn btn-outline-light btn-sm">
+                        <a href="../about.php" class="btn btn-outline-light btn-sm">
                             <i class="fas fa-info-circle me-2"></i>En savoir plus
                         </a>
                     </div>
@@ -17,20 +16,17 @@
                     <h5 class="mb-3">Liens rapides</h5>
                     <ul class="list-unstyled">
                         <li class="mb-2">
-                            <a href="<?php echo dirname($_SERVER['PHP_SELF']) === '/' ? '' : dirname($_SERVER['PHP_SELF']); ?>/index.php" 
-                               class="text-white-50 text-decoration-none hover-link">
+                            <a href="../index.php" class="text-white-50 text-decoration-none hover-link">
                                 <i class="fas fa-home me-2"></i>Accueil
                             </a>
                         </li>
                         <li class="mb-2">
-                            <a href="<?php echo dirname($_SERVER['PHP_SELF']) === '/' ? '' : dirname($_SERVER['PHP_SELF']); ?>/articles.php" 
-                               class="text-white-50 text-decoration-none hover-link">
+                            <a href="../articles.php" class="text-white-50 text-decoration-none hover-link">
                                 <i class="fas fa-newspaper me-2"></i>Articles
                             </a>
                         </li>
                         <li class="mb-2">
-                            <a href="<?php echo dirname($_SERVER['PHP_SELF']) === '/' ? '' : dirname($_SERVER['PHP_SELF']); ?>/about.php" 
-                               class="text-white-50 text-decoration-none hover-link">
+                            <a href="../about.php" class="text-white-50 text-decoration-none hover-link">
                                 <i class="fas fa-info-circle me-2"></i>À propos
                             </a>
                         </li>
@@ -69,14 +65,12 @@
                 <div class="col-md-6 text-center text-md-end">
                     <ul class="list-inline mb-0">
                         <li class="list-inline-item">
-                            <a href="<?php echo dirname($_SERVER['PHP_SELF']) === '/' ? '' : dirname($_SERVER['PHP_SELF']); ?>/mentions-legales.php" 
-                               class="text-white-50 text-decoration-none hover-link">
+                            <a href="../mentions-legales.php" class="text-white-50 text-decoration-none hover-link">
                                 Mentions légales
                             </a>
                         </li>
                         <li class="list-inline-item ms-3">
-                            <a href="<?php echo dirname($_SERVER['PHP_SELF']) === '/' ? '' : dirname($_SERVER['PHP_SELF']); ?>/confidentialite.php" 
-                               class="text-white-50 text-decoration-none hover-link">
+                            <a href="../confidentialite.php" class="text-white-50 text-decoration-none hover-link">
                                 Politique de confidentialité
                             </a>
                         </li>
