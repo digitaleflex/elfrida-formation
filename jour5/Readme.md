@@ -4,59 +4,89 @@ Un blog moderne et élégant développé en PHP avec une interface utilisateur B
 
 ## 🚀 Fonctionnalités
 
-- Interface utilisateur moderne et responsive avec animations
-- Design élégant utilisant Bootstrap 5 et Font Awesome
-- Système d'articles avec mise en avant
-- Système de commentaires interactif
-- Barre de recherche intégrée
-- Protection contre les injections SQL (PDO)
-- Effets visuels et animations modernes
-- Police personnalisée (Poppins)
-- Thème de couleur personnalisé avec variables CSS
-- Interface responsive et mobile-first
+### Système d'Articles
+- Interface utilisateur moderne et responsive
+- Mise en page élégante avec Bootstrap 5
+- Système de pagination avancé
+- Extraits d'articles avec aperçu
 
-## 🎨 Caractéristiques du Design
+### Recherche Avancée
+- Recherche en temps réel (AJAX)
+- Mise à jour dynamique des résultats
+- Debouncing pour optimiser les performances
+- Navigation dans l'historique intégrée
+- Indicateur de chargement
+- URLs partageables pour les résultats de recherche
 
-- **Typographie moderne**
-  - Police Poppins pour une meilleure lisibilité
-  - Hiérarchie visuelle claire
-  - Dégradés de texte pour les titres
+### Système de Commentaires
+- Commentaires en temps réel
+- Validation côté client et serveur
+- Notifications de succès/erreur
+- Interface utilisateur intuitive
 
-- **Composants élégants**
-  - Cartes avec effets de survol
-  - Boutons avec dégradés et animations
-  - Navigation avec icônes
-  - Badges et étiquettes stylisés
+### Gestion des Erreurs
+- Pages d'erreur 404 et 500 personnalisées
+- Suggestions d'articles sur la page 404
+- Animations et effets visuels
+- Section support utilisateur
 
-- **Effets visuels**
-  - Animations de chargement
-  - Effets de survol interactifs
-  - Ombres et élévations
-  - Transitions fluides
+### Design et UX
+- Design responsive et mobile-first
+- Animations fluides et transitions
+- Thème de couleur personnalisé
+- Police Poppins pour une meilleure lisibilité
+- Icônes Font Awesome intégrées
+
+## 🎨 Caractéristiques Techniques
+
+### Frontend
+- **Bootstrap 5** pour la mise en page
+- **Font Awesome** pour les icônes
+- **JavaScript** moderne avec Fetch API
+- Animations CSS personnalisées
+- Design responsive
+
+### Backend
+- **PHP 7.4+** avec PDO
+- Architecture MVC simplifiée
+- Gestion sécurisée des requêtes
+- Protection contre les injections SQL
+- Validation des données
+
+### Performance
+- Mise en cache des ressources
+- Compression GZIP
+- Optimisation des images
+- Debouncing des requêtes AJAX
+- Chargement différé (lazy loading)
 
 ## 📋 Prérequis
 
 - PHP 7.4 ou supérieur
 - MySQL 5.7 ou supérieur
-- Serveur web (Apache, Nginx, etc.)
+- Serveur web (Apache recommandé)
 - Extension PDO PHP activée
+- mod_rewrite Apache activé
 
 ## 🛠️ Installation
 
-1. Clonez ce dépôt dans votre répertoire web :
+1. Clonez le dépôt :
 ```bash
 git clone [URL_DU_REPO]
 ```
 
-2. Créez une base de données MySQL nommée `blog`
-
-3. Importez la structure de la base de données :
+2. Importez la base de données :
 ```sql
+-- Création de la base de données
+CREATE DATABASE IF NOT EXISTS blog;
+USE blog;
+
+-- Structure des tables
 CREATE TABLE articles (
     id INT AUTO_INCREMENT PRIMARY KEY,
     titre VARCHAR(255) NOT NULL,
     contenu TEXT NOT NULL,
-    date_creation DATETIME DEFAULT CURRENT_TIMESTAMP
+    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE commentaires (
@@ -64,51 +94,31 @@ CREATE TABLE commentaires (
     article_id INT NOT NULL,
     auteur VARCHAR(100) NOT NULL,
     commentaire TEXT NOT NULL,
-    date_creation DATETIME DEFAULT CURRENT_TIMESTAMP,
+    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (article_id) REFERENCES articles(id)
 );
 ```
 
-4. Configurez la connexion à la base de données dans `includes/config.php` :
+3. Configurez votre fichier `includes/config.php` :
 ```php
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'blog');
 define('DB_USER', 'votre_utilisateur');
 define('DB_PASS', 'votre_mot_de_passe');
+define('SITE_TITLE', 'Mon Blog Tech');
+define('SITE_DESCRIPTION', 'Un blog sur la technologie et le développement web');
 ```
 
-## 🎨 Personnalisation
-
-Le blog utilise un système de design moderne et personnalisable :
-
-1. **Variables CSS**
-   - Modifiez les couleurs dans `:root` dans `css/style.css`
-   - Personnalisez les ombres et rayons de bordure
-   - Ajustez les transitions et animations
-
-2. **Classes Bootstrap**
-   - Utilisez les classes Bootstrap pour la mise en page
-   - Personnalisez les composants Bootstrap existants
-   - Ajoutez de nouvelles sections avec la grille Bootstrap
-
-3. **Icônes et médias**
-   - Utilisez Font Awesome pour les icônes
-   - Ajoutez des images d'arrière-plan
-   - Personnalisez les icônes de navigation
-
-4. **Animations**
-   - Modifiez les animations existantes dans `css/style.css`
-   - Ajoutez de nouvelles animations CSS
-   - Personnalisez les effets de survol
+4. Configurez votre serveur web :
+   - Assurez-vous que mod_rewrite est activé
+   - Le fichier .htaccess est configuré pour la gestion des erreurs et les redirections
 
 ## 📁 Structure du Projet
 
 ```
+/
 ├── articles/
 │   └── article.php
-├── commentaires/
-│   ├── afficher_commentaires.php
-│   └── ajouter_commentaire.php
 ├── includes/
 │   ├── config.php
 │   ├── db.php
@@ -116,40 +126,51 @@ Le blog utilise un système de design moderne et personnalisable :
 │   └── footer.php
 ├── css/
 │   └── style.css
+├── .htaccess
 ├── index.php
+├── articles.php
+├── about.php
+├── 404.php
+├── 500.php
 └── README.md
 ```
 
 ## 🔒 Sécurité
 
-- Utilisation de PDO pour les requêtes préparées
-- Protection contre les injections XSS (htmlspecialchars)
+- Protection contre les injections SQL (PDO)
+- Échappement des données HTML (htmlspecialchars)
+- Protection des fichiers sensibles (.htaccess)
 - Validation des entrées utilisateur
-- Sécurisation des formulaires
+- Headers de sécurité configurés
 
-## 🔄 Fonctionnalités à venir
+## 🎯 Fonctionnalités à Venir
 
-- Mode sombre
-- Système de likes et partages
-- Éditeur de texte riche pour les commentaires
-- Galerie d'images pour les articles
-- Système de catégories
-- Authentification des utilisateurs
+- [ ] Système d'authentification
+- [ ] Panel d'administration
+- [ ] Éditeur WYSIWYG pour les articles
+- [ ] Système de tags et catégories
+- [ ] Mode sombre
+- [ ] API REST
+- [ ] Système de newsletter
+- [ ] Cache avancé
+
+## 🤝 Contribution
+
+Les contributions sont les bienvenues ! Pour contribuer :
+
+1. Forkez le projet
+2. Créez une branche pour votre fonctionnalité
+3. Committez vos changements
+4. Poussez vers la branche
+5. Ouvrez une Pull Request
 
 ## 📝 Licence
 
 Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 
-## 🤝 Contribution
+## 📧 Support
 
-Les contributions sont les bienvenues ! N'hésitez pas à :
-
-1. Fork le projet
-2. Créer une branche pour votre fonctionnalité
-3. Commit vos changements
-4. Push sur la branche
-5. Créer une Pull Request
-
-## 📧 Contact
-
-Pour toute question ou suggestion, n'hésitez pas à ouvrir une issue sur le projet.
+Pour toute question ou suggestion :
+- Ouvrez une issue
+- Contactez-nous via le formulaire sur la page À propos
+- Email : support@example.com
