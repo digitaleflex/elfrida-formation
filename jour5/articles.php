@@ -36,9 +36,9 @@ $page = min($page, max(1, $total_pages));
 $offset = ($page - 1) * $articles_par_page;
 
 // Requête finale avec pagination
-$sql .= " ORDER BY date_creation DESC LIMIT ? OFFSET ?";
-$params[] = (int)$articles_par_page;
-$params[] = (int)$offset;
+$sql .= " ORDER BY date_creation DESC";
+$sql .= " LIMIT " . (int)$articles_par_page;
+$sql .= " OFFSET " . (int)$offset;
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
