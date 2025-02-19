@@ -57,16 +57,24 @@ class Patient {
     public static function delete($id) {
         global $pdo;
         try {
-            // Démarrer une transaction
-            $pdo->beginTransaction();
-
             // Vérifier si le patient a des rendez-vous
             $stmt = $pdo->prepare("SELECT COUNT(*) FROM rendez_vous WHERE patient_id = ?");
             $stmt->execute([$id]);
             $hasAppointments = $stmt->fetchColumn() > 0;
 
             if ($hasAppointments) {
-                throw new Exception("Ce patient a des rendez-vous programmés. Veuillez d'abord supprimer ses rendez-vous.");
+                // Récupérer le nombre de rendez-vous
+                $stmt = $pdo->prepare("SELECT COUNT(*) as nb_rdv, MIN(date_rdv) as prochain FROM rendez_vous WHERE patient_id = ?");
+                $stmt->execute([$id]);
+                $info = $stmt->fetch();
+                
+                $message = "Ce patient a " . $info['nb_rdv'] . " rendez-vous planifié" . 
+                          ($info['nb_rdv'] > 1 ? 's' : '') . ". " .
+                          "Veuillez d'abord supprimer " . 
+                          ($info['nb_rdv'] > 1 ? 'ces rendez-vous' : 'ce rendez-vous') . 
+                          " avant de pouvoir supprimer le patient.";
+                
+                throw new Exception($message);
             }
 
             // Supprimer le patient
@@ -74,22 +82,17 @@ class Patient {
             $stmt->execute([$id]);
             
             if ($stmt->rowCount() === 0) {
-                throw new Exception("Patient non trouvé.");
+                throw new Exception("Ce patient n'existe pas dans la base de données.");
             }
 
             // Réorganiser les IDs
-            $pdo->query("SET @count = 0;");
-            $pdo->query("UPDATE patients SET id = @count:= @count + 1 ORDER BY id;");
-            $pdo->query("ALTER TABLE patients AUTO_INCREMENT = 1;");
-
-            // Valider la transaction
-            $pdo->commit();
+            $pdo->exec("SET @count = 0");
+            $pdo->exec("UPDATE patients SET id = @count:= @count + 1 ORDER BY id");
+            $pdo->exec("ALTER TABLE patients AUTO_INCREMENT = 1");
             
             return true;
         } catch (PDOException $e) {
-            // En cas d'erreur, annuler la transaction
-            $pdo->rollBack();
-            throw new Exception("Erreur lors de la suppression : " . $e->getMessage());
+            throw new Exception("Une erreur est survenue lors de la suppression du patient. Veuillez réessayer.");
         }
     }
 }

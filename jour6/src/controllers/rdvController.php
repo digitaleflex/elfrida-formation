@@ -48,11 +48,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 if (isset($_GET['delete'])) {
     try {
         $id = $_GET['delete'];
+        if (!is_numeric($id) || $id <= 0) {
+            throw new Exception("Numéro de rendez-vous invalide.");
+        }
+
         if (RendezVous::delete($id)) {
-            Flash::setMessage('success', 'Rendez-vous supprimé avec succès !');
+            Flash::setMessage('success', 'Le rendez-vous a été supprimé avec succès !');
         }
     } catch (Exception $e) {
-        Flash::setMessage('error', 'Erreur lors de la suppression du rendez-vous : ' . $e->getMessage());
+        Flash::setMessage('error', $e->getMessage());
     }
     header("Location: ../../index.Php");
     exit();
