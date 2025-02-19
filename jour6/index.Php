@@ -363,6 +363,9 @@ $flash = Flash::getMessage();
                 <a href="src/views/add_patient.php" class="btn btn-glass btn-glass-success me-2">
                     <i class="fas fa-user-plus me-2"></i>Ajouter un Patient
                 </a>
+                <a href="src/views/patients.php" class="btn btn-glass me-2">
+                    <i class="fas fa-users me-2"></i>Liste des Patients
+                </a>
                 <a href="src/views/add_rdv.php" class="btn btn-glass">
                     <i class="fas fa-calendar-plus me-2"></i>Ajouter un Rendez-vous
                 </a>

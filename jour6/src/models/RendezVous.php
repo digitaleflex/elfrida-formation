@@ -22,22 +22,23 @@ class RendezVous {
     // Méthode pour supprimer un rendez-vous
     public static function delete($id) {
         global $pdo;
+        
         try {
-            // Démarrer une transaction
-            $pdo->beginTransaction();
-
             // Vérifier si le rendez-vous existe
             $stmt = $pdo->prepare("SELECT * FROM rendez_vous WHERE id = ?");
             $stmt->execute([$id]);
             $rdv = $stmt->fetch();
 
             if (!$rdv) {
-                throw new Exception("Ce rendez-vous n'existe pas.");
+                throw new Exception("Ce rendez-vous n'existe pas dans la base de données.");
             }
 
-            // Vérifier si la date est passée
-            if (strtotime($rdv['date_rdv']) < strtotime(date('Y-m-d'))) {
-                throw new Exception("Impossible de supprimer un rendez-vous passé.");
+            // Vérifier si le rendez-vous est pour aujourd'hui et déjà passé
+            if (strtotime($rdv['date_rdv']) == strtotime(date('Y-m-d'))) {
+                $heure_actuelle = date('H:i:s');
+                if (strtotime($rdv['heure_rdv']) < strtotime($heure_actuelle)) {
+                    throw new Exception("Désolé, vous ne pouvez pas supprimer un rendez-vous déjà passé.");
+                }
             }
 
             // Supprimer le rendez-vous
@@ -45,18 +46,14 @@ class RendezVous {
             $stmt->execute([$id]);
 
             // Réorganiser les IDs
-            $pdo->query("SET @count = 0;");
-            $pdo->query("UPDATE rendez_vous SET id = @count:= @count + 1 ORDER BY id;");
-            $pdo->query("ALTER TABLE rendez_vous AUTO_INCREMENT = 1;");
-
-            // Valider la transaction
-            $pdo->commit();
+            $pdo->exec("SET @count = 0");
+            $pdo->exec("UPDATE rendez_vous SET id = @count:= @count + 1 ORDER BY id");
+            $pdo->exec("ALTER TABLE rendez_vous AUTO_INCREMENT = 1");
             
             return true;
+
         } catch (PDOException $e) {
-            // En cas d'erreur, annuler la transaction
-            $pdo->rollBack();
-            throw new Exception("Erreur lors de la suppression : " . $e->getMessage());
+            throw new Exception("Une erreur est survenue lors de la suppression du rendez-vous. Veuillez réessayer.");
         }
     }
 }
