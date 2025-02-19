@@ -1,7 +1,9 @@
 <?php
 require_once __DIR__ . '/../models/Patient.php';
+require_once __DIR__ . '/../utils/flash.php';
 
 $patients = Patient::getAll(); // Récupérer la liste des patients pour le menu déroulant
+$flash = Flash::getMessage();
 ?>
 
 <!DOCTYPE html>
@@ -210,9 +212,47 @@ $patients = Patient::getAll(); // Récupérer la liste des patients pour le menu
             background: #764ba2;
             color: white;
         }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            backdrop-filter: blur(10px);
+            animation: slideIn 0.5s ease-out, fadeOut 0.5s ease-out 3s forwards;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .notification.success {
+            background: rgba(40, 167, 69, 0.9);
+            border: 1px solid rgba(40, 167, 69, 0.2);
+        }
+
+        .notification.error {
+            background: rgba(220, 53, 69, 0.9);
+            border: 1px solid rgba(220, 53, 69, 0.2);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; visibility: hidden; }
+        }
     </style>
 </head>
 <body>
+    <?php if ($flash): ?>
+        <div class="notification <?= $flash['type'] ?>">
+            <?= $flash['message'] ?>
+        </div>
+    <?php endif; ?>
     <div class="container">
         <div class="glass-container">
             <h2 class="mb-4">
