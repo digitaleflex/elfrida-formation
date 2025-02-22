@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord des Projets</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+    <style>
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+        
+        .toast {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            min-width: 350px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            transform-origin: right;
+            animation: toastSlideIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .toast-icon {
+            font-size: 24px;
+            margin-right: 12px;
+        }
+
+        .toast-content {
+            flex-grow: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+
+        .toast-message {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+        
+        .toast-success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+        
+        .toast-error {
+            background: linear-gradient(135deg, #dc3545, #ff4444);
+            color: white;
+        }
+        
+        .toast-warning {
+            background: linear-gradient(135deg, #ffc107, #ff9800);
+            color: white;
+        }
+
+        .toast-close {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toast-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        @keyframes toastSlideIn {
+            from {
+                transform: translateX(100%) scale(0.5);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes toastSlideOut {
+            from {
+                transform: translateX(0) scale(1);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%) scale(0.5);
+                opacity: 0;
+            }
+        }
+
+        .fixed.inset-0 {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: scale(1);
+            }
+            to {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+        }
+
+        .modal-exit {
+            animation: fadeOut 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+    <div id="toastContainer" class="toast-container"></div>
+    <!-- Modal Ajouter Projet -->
+    <div id="addProjectModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <h3 class="text-lg font-semibold mb-4">Ajouter un Nouveau Projet</h3>
+                <form id="addProjectForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Nom du Projet</label>
+                        <input type="text" name="nom_projet" required 
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Description</label>
+                        <textarea name="description" rows="3" 
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Date Début</label>
+                            <input type="date" name="date_creation" required 
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Date Fin</label>
+                            <input type="date" name="date_fin" required 
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Catégorie</label>
+                            <select name="categorie_id" required 
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Priorité</label>
+                            <select name="priorite" required 
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                <option value="basse">Basse</option>
+                                <option value="moyenne">Moyenne</option>
+                                <option value="haute">Haute</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Budget (F CFA)</label>
+                        <input type="number" name="budget" required 
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                    <div class="flex justify-end space-x-3 mt-5">
+                        <button type="button" onclick="closeModal()" 
+                                class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
+                            Annuler
+                        </button>
+                        <button type="submit" 
+                                class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+                            Ajouter
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Modifier Projet -->
+    <div id="editProjectModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <h3 class="text-lg font-semibold mb-4">Modifier le Projet</h3>
+                <form id="editProjectForm" class="space-y-4">
+                    <input type="hidden" name="project_id">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Nom du Projet</label>
+                        <input type="text" name="nom_projet" required 
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Description</label>
+                        <textarea name="description" rows="3" 
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Date Début</label>
+                            <input type="date" name="date_creation" required 
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Date Fin</label>
+                            <input type="date" name="date_fin" required 
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Catégorie</label>
+                            <select name="categorie_id" required 
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Statut</label>
+                            <select name="statut" required 
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                <option value="en cours">En cours</option>
+                                <option value="terminé">Terminé</option>
+                                <option value="annulé">Annulé</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Priorité</label>
+                            <select name="priorite" required 
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                <option value="basse">Basse</option>
+                                <option value="moyenne">Moyenne</option>
+                                <option value="haute">Haute</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Progression (%)</label>
+                            <input type="number" name="progression" min="0" max="100" required 
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Budget (F CFA)</label>
+                        <input type="number" name="budget" required 
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                    <div class="flex justify-end space-x-3 mt-5">
+                        <button type="button" onclick="closeEditModal()" 
+                                class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
+                            Annuler
+                        </button>
+                        <button type="submit" 
+                                class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+                            Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bg-white shadow-lg">
+        <div class="container mx-auto px-6 py-3">
+            <div class="flex items-center justify-between">
+                <div class="text-xl font-semibold">
+                    <i class="fas fa-project-diagram"></i> Gestion de Projets
+                </div>
+                <div class="flex space-x-4">
+                    <button onclick="openModal()" class="bg-blue-500 text-white px-4 py-2 rounded-lg">
+                        <i class="fas fa-plus"></i> Nouveau Projet
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto p-6">
+        <!-- Filtres -->
+        <div class="bg-white p-4 rounded-lg shadow mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Période</label>
+                    <div class="flex space-x-2">
+                        <input type="date" id="startDate" class="border rounded p-2 w-full">
+                        <input type="date" id="endDate" class="border rounded p-2 w-full">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Catégorie</label>
+                    <select id="categoryFilter" class="border rounded p-2 w-full">
+                        <option value="">Toutes</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Statut</label>
+                    <select id="statusFilter" class="border rounded p-2 w-full">
+                        <option value="">Tous</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Priorité</label>
+                    <select id="priorityFilter" class="border rounded p-2 w-full">
+                        <option value="">Toutes</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPIs -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="text-gray-500 text-sm">Projets Totaux</h3>
+                <p id="totalProjects" class="text-2xl font-bold">0</p>
+                <div class="text-green-500 text-sm">
+                    <i class="fas fa-arrow-up"></i> +5% ce mois
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="text-gray-500 text-sm">Budget Total</h3>
+                <p id="totalBudget" class="text-2xl font-bold">0 F CFA</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="text-gray-500 text-sm">Progression Moyenne</h3>
+                <p id="avgProgress" class="text-2xl font-bold">0%</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="text-gray-500 text-sm">Projets En Cours</h3>
+                <p id="activeProjects" class="text-2xl font-bold">0</p>
+            </div>
+        </div>
+
+        <!-- Graphiques -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="text-lg font-semibold mb-4">Répartition par Statut</h3>
+                <div class="h-48">
+                <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="text-lg font-semibold mb-4">Progression par Catégorie</h3>
+                <div class="h-48">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Liste des Projets -->
+        <div class="bg-white rounded-lg shadow">
+            <div class="p-4 border-b">
+                <h3 class="text-lg font-semibold">Projets Récents</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Projet</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Catégorie</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Progression</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="projectsList" class="bg-white divide-y divide-gray-200">
+                        <!-- Les projets seront insérés ici dynamiquement -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="flex gap-2">
+            <button onclick="exportToPDF()" class="bg-red-500 text-white px-4 py-2 rounded-lg">
+                <i class="fas fa-file-pdf"></i> Export PDF
+            </button>
+            <button onclick="exportToExcel()" class="bg-green-500 text-white px-4 py-2 rounded-lg">
+                <i class="fas fa-file-excel"></i> Export Excel
+            </button>
+        </div>
+
+        <div class="grid grid-cols-3 gap-4">
+            <div class="bg-gray-100 p-4 rounded">
+                <h3 class="font-semibold mb-4">À Faire</h3>
+                <div class="space-y-2" id="todo-column">
+                    <!-- Projets à faire -->
+                </div>
+            </div>
+            <div class="bg-gray-100 p-4 rounded">
+                <h3 class="font-semibold mb-4">En Cours</h3>
+                <div class="space-y-2" id="in-progress-column">
+                    <!-- Projets en cours -->
+                </div>
+            </div>
+            <div class="bg-gray-100 p-4 rounded">
+                <h3 class="font-semibold mb-4">Terminé</h3>
+                <div class="space-y-2" id="done-column">
+                    <!-- Projets terminés -->
+                </div>
+            </div>
+        </div>
+
+        <div class="relative">
+            <input type="text" 
+                   id="searchInput" 
+                   class="w-full p-2 pl-10 rounded border" 
+                   placeholder="Rechercher un projet...">
+            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+        </div>
+    </div>
+
+    <div class="relative">
+        <button id="notifButton" class="p-2">
+            <i class="fas fa-bell"></i>
+            <span class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-4 h-4 text-xs">3</span>
+        </button>
+        <div id="notifPanel" class="hidden absolute right-0 mt-2 w-80 bg-white shadow-lg rounded-lg">
+            <div class="p-4">
+                <h4 class="font-semibold">Notifications</h4>
+                <div class="mt-2 space-y-2">
+                    <div class="p-2 hover:bg-gray-50 rounded">
+                        <p class="text-sm">Nouveau projet ajouté</p>
+                        <span class="text-xs text-gray-500">Il y a 5 min</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button id="darkModeToggle" class="p-2">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <script>
+        // Configuration des graphiques
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        boxWidth: 15
+                    }
+                }
+            },
+            animation: {
+                duration: 1000
+            }
+        };
+
+        // Initialisation des graphiques
+        let statusChart, categoryChart;
+
+        // Fonction pour formater les nombres en CFA
+        const formatCFA = (number) => new Intl.NumberFormat('fr-FR', { 
+            style: 'currency', 
+            currency: 'XOF',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(number).replace('XOF', 'F CFA');
+
+        // Fonction pour mettre à jour les KPIs
+        function updateKPIs(data) {
+            const totalProjects = data.length;
+            const budgetTotal = data.reduce((sum, project) => sum + parseFloat(project.budget || 0), 0);
+            const avgProgress = data.reduce((sum, project) => sum + parseInt(project.progression || 0), 0) / totalProjects;
+            const activeProjects = data.filter(project => project.statut === 'en cours').length;
+
+            document.getElementById('totalProjects').textContent = totalProjects;
+            document.getElementById('totalBudget').textContent = formatCFA(budgetTotal);
+            document.getElementById('avgProgress').textContent = `${Math.round(avgProgress)}%`;
+            document.getElementById('activeProjects').textContent = activeProjects;
+        }
+
+        // Fonction pour mettre à jour les graphiques
+        function updateCharts(data) {
+            // Données pour le graphique des statuts
+            const statusData = {
+                        labels: ['En cours', 'Terminé', 'Annulé'],
+                        datasets: [{
+                            data: [
+                        data.filter(p => p.statut === 'en cours').length,
+                        data.filter(p => p.statut === 'terminé').length,
+                        data.filter(p => p.statut === 'annulé').length
+                    ],
+                    backgroundColor: ['#3498db', '#2ecc71', '#e74c3c'],
+                    borderWidth: 0
+                }]
+            };
+
+            // Données pour le graphique des catégories
+            const categories = [...new Set(data.map(p => p.categorie_nom))];
+            const categoryData = {
+                labels: categories,
+                datasets: [{
+                    label: 'Progression moyenne (%)',
+                    data: categories.map(cat => {
+                        const projetsCategorie = data.filter(p => p.categorie_nom === cat);
+                        return Math.round(projetsCategorie.reduce((sum, p) => sum + p.progression, 0) / projetsCategorie.length);
+                    }),
+                    backgroundColor: categories.map(cat => 
+                        data.find(p => p.categorie_nom === cat)?.couleur || '#3498db'
+                    ),
+                    borderWidth: 0
+                }]
+            };
+
+            // Mise à jour des graphiques
+            if (statusChart) statusChart.destroy();
+            if (categoryChart) categoryChart.destroy();
+
+            statusChart = new Chart(
+                document.getElementById('statusChart').getContext('2d'),
+                {
+                    type: 'doughnut',
+                    data: statusData,
+                    options: {
+                        ...chartOptions,
+                        cutout: '70%',
+                        plugins: {
+                            ...chartOptions.plugins,
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 10,
+                                    usePointStyle: true,
+                                    boxWidth: 8,
+                                    font: {
+                                        size: 11
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            );
+
+            categoryChart = new Chart(
+                document.getElementById('categoryChart').getContext('2d'),
+                {
+                    type: 'bar',
+                    data: categoryData,
+                    options: {
+                        ...chartOptions,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: {
+                                    callback: value => `${value}%`,
+                                    font: {
+                                        size: 11
+                                    }
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    font: {
+                                        size: 11
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            ...chartOptions.plugins,
+                            legend: {
+                                display: false
+                            }
+                        },
+                        barThickness: 20
+                    }
+                }
+            );
+        }
+
+        // Fonction pour mettre à jour la liste des projets
+        function updateProjectsList(data) {
+            const tbody = document.getElementById('projectsList');
+            tbody.innerHTML = '';
+
+            data.forEach(project => {
+                const row = document.createElement('tr');
+                // Échapper les caractères spéciaux dans l'objet projet pour JSON.stringify
+                const projectData = JSON.stringify(project).replace(/"/g, '&quot;');
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4">
+                        <div class="flex items-center">
+                            <div>
+                                <div class="font-medium text-gray-900">${project.nom_projet}</div>
+                                <div class="text-sm text-gray-500">${project.description || ''}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 rounded-full text-xs" 
+                              style="background-color: ${project.couleur}20; color: ${project.couleur}">
+                            ${project.categorie_nom}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div class="bg-blue-600 h-2.5 rounded-full" style="width: ${project.progression}%"></div>
+                        </div>
+                        <span class="text-sm text-gray-500">${project.progression}%</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 rounded-full text-xs ${
+                            project.statut === 'en cours' ? 'bg-blue-100 text-blue-800' :
+                            project.statut === 'terminé' ? 'bg-green-100 text-green-800' :
+                            'bg-red-100 text-red-800'
+                        }">
+                            ${project.statut}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <button onclick='openEditModal(${projectData})' class="text-blue-600 hover:text-blue-900">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deleteProject(${project.id})" class="text-red-600 hover:text-red-900 ml-3">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Fonction pour charger et mettre à jour toutes les données
+        function loadData() {
+            fetch('load.php')
+                .then(response => response.json())
+                .then(data => {
+                    updateKPIs(data);
+                    updateCharts(data);
+                    updateProjectsList(data);
+                })
+                .catch(error => console.error('Erreur:', error));
+        }
+
+        // Initialisation des filtres
+        function initializeFilters(data) {
+            const categories = [...new Set(data.map(p => p.categorie_nom))];
+            const statuts = ['en cours', 'terminé', 'annulé'];
+            const priorites = ['basse', 'moyenne', 'haute'];
+
+            const categorySelect = document.getElementById('categoryFilter');
+            const statusSelect = document.getElementById('statusFilter');
+            const prioritySelect = document.getElementById('priorityFilter');
+
+            categories.forEach(cat => {
+                categorySelect.add(new Option(cat, cat));
+            });
+
+            statuts.forEach(statut => {
+                statusSelect.add(new Option(statut, statut));
+            });
+
+            priorites.forEach(priorite => {
+                prioritySelect.add(new Option(priorite, priorite));
+            });
+        }
+
+        // Événements des filtres
+        document.querySelectorAll('select, input[type="date"]').forEach(element => {
+            element.addEventListener('change', () => {
+                const filters = {
+                    startDate: document.getElementById('startDate').value,
+                    endDate: document.getElementById('endDate').value,
+                    category: document.getElementById('categoryFilter').value,
+                    status: document.getElementById('statusFilter').value,
+                    priority: document.getElementById('priorityFilter').value
+                };
+
+                // Appliquer les filtres et mettre à jour l'interface
+                fetch(`load.php?${new URLSearchParams(filters)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        updateKPIs(data);
+                        updateCharts(data);
+                        updateProjectsList(data);
+                    });
+            });
+        });
+
+        // Chargement initial des données
+        loadData();
+
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        darkModeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            // Sauvegarder la préférence
+            localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
+        });
+
+        new Sortable(document.querySelector('.grid'), {
+            animation: 150,
+            ghostClass: 'bg-blue-100'
+        });
+
+        // Fonctions pour le modal
+        function openModal() {
+            document.getElementById('addProjectModal').classList.remove('hidden');
+            // Charger les catégories dans le select
+            loadCategories();
+        }
+
+        function closeModal() {
+            document.getElementById('addProjectModal').classList.add('hidden');
+        }
+
+        // Charger les catégories
+        function loadCategories(selectedId = null) {
+            fetch('load.php?action=categories')
+                .then(response => response.json())
+                .then(categories => {
+                    const selects = document.querySelectorAll('select[name="categorie_id"]');
+                    selects.forEach(select => {
+                        select.innerHTML = '';
+                        categories.forEach(cat => {
+                            const option = new Option(cat.nom, cat.id);
+                            if (selectedId && cat.id == selectedId) {
+                                option.selected = true;
+                            }
+                            select.add(option);
+                        });
+                    });
+                });
+        }
+
+        // Gérer la soumission du formulaire
+        document.getElementById('addProjectForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const submitButton = this.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Ajout en cours...';
+
+            fetch('load.php?action=add_project', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    closeModal();
+                    loadData();
+                    this.reset();
+                    showToast('Projet ajouté avec succès', 'success');
+                } else {
+                    showToast(data.error || 'Erreur lors de l\'ajout du projet', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                showToast('Erreur lors de l\'ajout du projet', 'error');
+            })
+            .finally(() => {
+                submitButton.disabled = false;
+                submitButton.innerHTML = 'Ajouter';
+            });
+        });
+
+        // Fonctions pour le modal de modification
+        function openEditModal(project) {
+            document.getElementById('editProjectModal').classList.remove('hidden');
+            const form = document.getElementById('editProjectForm');
+            
+            // Formater les dates (YYYY-MM-DD)
+            const formatDate = (dateString) => {
+                const date = new Date(dateString);
+                return date.toISOString().split('T')[0];
+            };
+            
+            // Remplir le formulaire avec les données du projet
+            form.querySelector('[name="project_id"]').value = project.id;
+            form.querySelector('[name="nom_projet"]').value = project.nom_projet;
+            form.querySelector('[name="description"]').value = project.description || '';
+            form.querySelector('[name="date_creation"]').value = formatDate(project.date_creation);
+            form.querySelector('[name="date_fin"]').value = formatDate(project.date_fin);
+            form.querySelector('[name="statut"]').value = project.statut;
+            form.querySelector('[name="priorite"]').value = project.priorite;
+            form.querySelector('[name="progression"]').value = project.progression;
+            form.querySelector('[name="budget"]').value = project.budget;
+            
+            // Charger les catégories et sélectionner celle du projet
+            loadCategories(project.categorie_id);
+        }
+
+        function closeEditModal() {
+            document.getElementById('editProjectModal').classList.add('hidden');
+        }
+
+        function deleteProject(projectId) {
+            const confirmDelete = document.createElement('div');
+            confirmDelete.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center';
+            confirmDelete.innerHTML = `
+                <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full mx-4">
+                    <h3 class="text-xl font-semibold mb-4">Confirmer la suppression</h3>
+                    <p class="text-gray-600 mb-6">Êtes-vous sûr de vouloir supprimer ce projet ? Cette action est irréversible.</p>
+                    <div class="flex justify-end space-x-3">
+                        <button onclick="this.closest('.fixed').remove()" 
+                                class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
+                            Annuler
+                        </button>
+                        <button onclick="confirmDeleteProject(${projectId}, this)" 
+                                class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">
+                            Supprimer
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(confirmDelete);
+        }
+
+        function confirmDeleteProject(projectId, button) {
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Suppression...';
+            
+            fetch(`load.php?action=delete_project&id=${projectId}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Trouver et supprimer la boîte de dialogue de confirmation
+                    const confirmDialog = document.querySelector('.fixed.inset-0');
+                    if (confirmDialog) {
+                        // Ajouter une animation de sortie
+                        confirmDialog.style.animation = 'fadeOut 0.3s ease-out';
+                        setTimeout(() => {
+                            confirmDialog.remove();
+                        }, 300);
+                    }
+                    
+                    showToast(`
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-2xl mr-3"></i>
+                            <div>
+                                <div class="font-semibold">Projet supprimé</div>
+                                <div class="text-sm opacity-90">Le projet a été supprimé avec succès</div>
+                            </div>
+                        </div>
+                    `, 'success');
+                    
+                    loadData();
+                } else {
+                    // En cas d'erreur, réactiver le bouton et afficher l'erreur
+                    button.disabled = false;
+                    button.innerHTML = 'Supprimer';
+                    showToast(`
+                        <div class="flex items-center">
+                            <i class="fas fa-exclamation-circle text-2xl mr-3"></i>
+                            <div>
+                                <div class="font-semibold">Erreur de suppression</div>
+                                <div class="text-sm opacity-90">${data.error || 'Une erreur est survenue'}</div>
+                            </div>
+                        </div>
+                    `, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                button.disabled = false;
+                button.innerHTML = 'Supprimer';
+                showToast(`
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-circle text-2xl mr-3"></i>
+                        <div>
+                            <div class="font-semibold">Erreur de suppression</div>
+                            <div class="text-sm opacity-90">Une erreur inattendue est survenue</div>
+                        </div>
+                    </div>
+                `, 'error');
+            });
+        }
+
+        // Ajouter après la fonction openEditModal
+        function updateProgressBar(value) {
+            const progressBar = document.querySelector('.bg-blue-600');
+            if (progressBar) {
+                progressBar.style.width = `${value}%`;
+            }
+        }
+
+        // Ajouter un écouteur d'événement pour le champ de progression
+        document.querySelector('input[name="progression"]').addEventListener('input', function(e) {
+            updateProgressBar(this.value);
+        });
+
+        // Remplacer la gestion du formulaire de modification
+        document.getElementById('editProjectForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const submitButton = this.querySelector('button[type="submit"]');
+            
+            // Désactiver le bouton et montrer le chargement
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mise à jour...';
+
+            // Validation de la progression
+            const progression = parseInt(formData.get('progression'));
+            if (progression < 0 || progression > 100) {
+                showToast('La progression doit être comprise entre 0 et 100', 'warning');
+                submitButton.disabled = false;
+                submitButton.innerHTML = 'Enregistrer';
+                return;
+            }
+
+            fetch('load.php?action=update_project', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    // Récupérer les nouvelles données pour vérifier la mise à jour
+                    return fetch('load.php')
+                        .then(response => response.json())
+                        .then(projects => {
+                            const updatedProject = projects.find(p => p.id === parseInt(formData.get('project_id')));
+                            if (updatedProject) {
+                                // Vérifier si les modifications ont bien été appliquées
+                                const modifications = {
+                                    nom: updatedProject.nom_projet === formData.get('nom_projet'),
+                                    statut: updatedProject.statut === formData.get('statut'),
+                                    progression: updatedProject.progression === progression,
+                                    budget: parseFloat(updatedProject.budget) === parseFloat(formData.get('budget'))
+                                };
+
+                                const allModificationsApplied = Object.values(modifications).every(v => v);
+
+                                if (allModificationsApplied) {
+                                    showToast(`
+                                        <div class="font-semibold mb-1">Modifications appliquées avec succès :</div>
+                                        <ul class="text-sm list-disc list-inside">
+                                            <li>Nom : ${updatedProject.nom_projet}</li>
+                                            <li>Statut : ${updatedProject.statut}</li>
+                                            <li>Progression : ${updatedProject.progression}%</li>
+                                            <li>Budget : ${formatCFA(updatedProject.budget)}</li>
+                                        </ul>
+                                    `, 'success', 5000);
+                                    closeEditModal();
+                                    loadData();
+                                } else {
+                                    showToast('Certaines modifications n\'ont pas été appliquées correctement', 'warning');
+                                }
+                            }
+                        });
+                } else {
+                    showToast(`Erreur lors de la modification : ${data.error || 'Erreur inconnue'}`, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                showToast('Erreur lors de la modification du projet', 'error');
+            })
+            .finally(() => {
+                submitButton.disabled = false;
+                submitButton.innerHTML = 'Enregistrer';
+            });
+        });
+
+        // Modifier la fonction showToast pour supporter le HTML
+        function showToast(message, type = 'success', duration = 3000) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            
+            let title, icon;
+            switch(type) {
+                case 'success':
+                    title = 'Succès !';
+                    icon = '<i class="fas fa-check-circle"></i>';
+                    break;
+                case 'error':
+                    title = 'Erreur';
+                    icon = '<i class="fas fa-exclamation-circle"></i>';
+                    break;
+                case 'warning':
+                    title = 'Attention';
+                    icon = '<i class="fas fa-exclamation-triangle"></i>';
+                    break;
+            }
+            
+            toast.innerHTML = `
+                <div class="toast-icon">
+                    ${icon}
+                </div>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <div class="toast-close" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </div>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Animation de sortie
+            setTimeout(() => {
+                toast.style.animation = 'toastSlideOut 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards';
+                setTimeout(() => {
+                    toast.remove();
+                }, 500);
+            }, duration);
+
+            // Effet de survol
+            toast.addEventListener('mouseenter', () => {
+                toast.style.animationPlayState = 'paused';
+            });
+
+            toast.addEventListener('mouseleave', () => {
+                toast.style.animationPlayState = 'running';
+            });
+        }
+    </script>
+</body>
+
+</html>
