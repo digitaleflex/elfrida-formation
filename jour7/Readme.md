@@ -203,12 +203,3 @@ Le présent avis de droit d'auteur et cet avis de permission doivent être inclu
 LE LOGICIEL EST FOURNI "EN L'ÉTAT", SANS AUCUNE GARANTIE D'AUCUNE SORTE, EXPRESSE OU IMPLICITE, Y COMPRIS MAIS SANS S'Y LIMITER LES GARANTIES DE COMMERCIALISATION, D'ADAPTATION À UN USAGE PARTICULIER ET DE NON-VIOLATION. EN AUCUN CAS LES AUTEURS OU LES DÉTENTEURS DU DROIT D'AUTEUR NE POURRONT ÊTRE TENUS RESPONSABLES DE QUELQUE RECLAMATION, DOMMAGES OU AUTRE RESPONSABILITÉ, QU'IL S'AGISSE D'UNE ACTION EN CONTRAT, DÉLIT OU AUTRE, DÉCOULANT DE, OU EN RELATION AVEC, LE LOGICIEL OU L'UTILISATION OU AUTRES TRANSACTIONS DANS LE LOGICIEL.
 
 ```
-
----
-
-### **Points Clés de l'Amélioration :**
-1. **Clarté** : Chaque section est clairement séparée avec des titres en gras et des listes à puces pour rendre le contenu plus lisible.
-2. **Structure** : Le contenu est bien hiérarchisé, ce qui aide à mieux naviguer dans le fichier.
-3. **Ajout de visuels** : Utilisation d'emojis pour rendre chaque fonctionnalité plus attrayante visuellement.
-4. **Éléments détaillés** : Les sections de "Fonctionnalités Détaillées" et "Sécurité" sont ajoutées pour donner une vision claire de ce que le projet implémente et comment il est sécurisé.
-
