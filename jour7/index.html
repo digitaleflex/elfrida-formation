@@ -69,7 +69,7 @@
             </div>
             <div class="bg-white p-4 rounded-lg shadow">
                 <h3 class="text-gray-500 text-sm">Budget Total</h3>
-                <p id="totalBudget" class="text-2xl font-bold">0 €</p>
+                <p id="totalBudget" class="text-2xl font-bold">0 F CFA</p>
             </div>
             <div class="bg-white p-4 rounded-lg shadow">
                 <h3 class="text-gray-500 text-sm">Progression Moyenne</h3>
@@ -85,11 +85,15 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div class="bg-white p-4 rounded-lg shadow">
                 <h3 class="text-lg font-semibold mb-4">Répartition par Statut</h3>
-                <canvas id="statusChart"></canvas>
+                <div class="h-48">
+                    <canvas id="statusChart"></canvas>
+                </div>
             </div>
             <div class="bg-white p-4 rounded-lg shadow">
                 <h3 class="text-lg font-semibold mb-4">Progression par Catégorie</h3>
-                <canvas id="categoryChart"></canvas>
+                <div class="h-48">
+                    <canvas id="categoryChart"></canvas>
+                </div>
             </div>
         </div>
 
@@ -118,7 +122,258 @@
     </div>
 
     <script>
-        // Le code JavaScript sera fourni dans la réponse suivante
+        // Configuration des graphiques
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        boxWidth: 15
+                    }
+                }
+            },
+            animation: {
+                duration: 1000
+            }
+        };
+
+        // Initialisation des graphiques
+        let statusChart, categoryChart;
+
+        // Fonction pour formater les nombres en CFA
+        const formatCFA = (number) => new Intl.NumberFormat('fr-FR', { 
+            style: 'currency', 
+            currency: 'XOF',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(number).replace('XOF', 'F CFA');
+
+        // Fonction pour mettre à jour les KPIs
+        function updateKPIs(data) {
+            const totalProjects = data.length;
+            const budgetTotal = data.reduce((sum, project) => sum + parseFloat(project.budget || 0), 0);
+            const avgProgress = data.reduce((sum, project) => sum + parseInt(project.progression || 0), 0) / totalProjects;
+            const activeProjects = data.filter(project => project.statut === 'en cours').length;
+
+            document.getElementById('totalProjects').textContent = totalProjects;
+            document.getElementById('totalBudget').textContent = formatCFA(budgetTotal);
+            document.getElementById('avgProgress').textContent = `${Math.round(avgProgress)}%`;
+            document.getElementById('activeProjects').textContent = activeProjects;
+        }
+
+        // Fonction pour mettre à jour les graphiques
+        function updateCharts(data) {
+            // Données pour le graphique des statuts
+            const statusData = {
+                labels: ['En cours', 'Terminé', 'Annulé'],
+                datasets: [{
+                    data: [
+                        data.filter(p => p.statut === 'en cours').length,
+                        data.filter(p => p.statut === 'terminé').length,
+                        data.filter(p => p.statut === 'annulé').length
+                    ],
+                    backgroundColor: ['#3498db', '#2ecc71', '#e74c3c'],
+                    borderWidth: 0
+                }]
+            };
+
+            // Données pour le graphique des catégories
+            const categories = [...new Set(data.map(p => p.categorie_nom))];
+            const categoryData = {
+                labels: categories,
+                datasets: [{
+                    label: 'Progression moyenne (%)',
+                    data: categories.map(cat => {
+                        const projetsCategorie = data.filter(p => p.categorie_nom === cat);
+                        return Math.round(projetsCategorie.reduce((sum, p) => sum + p.progression, 0) / projetsCategorie.length);
+                    }),
+                    backgroundColor: categories.map(cat => 
+                        data.find(p => p.categorie_nom === cat)?.couleur || '#3498db'
+                    ),
+                    borderWidth: 0
+                }]
+            };
+
+            // Mise à jour des graphiques
+            if (statusChart) statusChart.destroy();
+            if (categoryChart) categoryChart.destroy();
+
+            statusChart = new Chart(
+                document.getElementById('statusChart').getContext('2d'),
+                {
+                    type: 'doughnut',
+                    data: statusData,
+                    options: {
+                        ...chartOptions,
+                        cutout: '70%',
+                        plugins: {
+                            ...chartOptions.plugins,
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 10,
+                                    usePointStyle: true,
+                                    boxWidth: 8,
+                                    font: {
+                                        size: 11
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            );
+
+            categoryChart = new Chart(
+                document.getElementById('categoryChart').getContext('2d'),
+                {
+                    type: 'bar',
+                    data: categoryData,
+                    options: {
+                        ...chartOptions,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: {
+                                    callback: value => `${value}%`,
+                                    font: {
+                                        size: 11
+                                    }
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    font: {
+                                        size: 11
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            ...chartOptions.plugins,
+                            legend: {
+                                display: false
+                            }
+                        },
+                        barThickness: 20
+                    }
+                }
+            );
+        }
+
+        // Fonction pour mettre à jour la liste des projets
+        function updateProjectsList(data) {
+            const tbody = document.getElementById('projectsList');
+            tbody.innerHTML = '';
+
+            data.forEach(project => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-6 py-4">
+                        <div class="flex items-center">
+                            <div>
+                                <div class="font-medium text-gray-900">${project.nom_projet}</div>
+                                <div class="text-sm text-gray-500">${project.description || ''}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 rounded-full text-xs" 
+                              style="background-color: ${project.couleur}20; color: ${project.couleur}">
+                            ${project.categorie_nom}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div class="bg-blue-600 h-2.5 rounded-full" style="width: ${project.progression}%"></div>
+                        </div>
+                        <span class="text-sm text-gray-500">${project.progression}%</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 rounded-full text-xs ${
+                            project.statut === 'en cours' ? 'bg-blue-100 text-blue-800' :
+                            project.statut === 'terminé' ? 'bg-green-100 text-green-800' :
+                            'bg-red-100 text-red-800'
+                        }">
+                            ${project.statut}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <button class="text-blue-600 hover:text-blue-900">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="text-red-600 hover:text-red-900 ml-3">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Fonction pour charger et mettre à jour toutes les données
+        function loadData() {
+            fetch('load.php')
+                .then(response => response.json())
+                .then(data => {
+                    updateKPIs(data);
+                    updateCharts(data);
+                    updateProjectsList(data);
+                })
+                .catch(error => console.error('Erreur:', error));
+        }
+
+        // Initialisation des filtres
+        function initializeFilters(data) {
+            const categories = [...new Set(data.map(p => p.categorie_nom))];
+            const statuts = ['en cours', 'terminé', 'annulé'];
+            const priorites = ['basse', 'moyenne', 'haute'];
+
+            const categorySelect = document.getElementById('categoryFilter');
+            const statusSelect = document.getElementById('statusFilter');
+            const prioritySelect = document.getElementById('priorityFilter');
+
+            categories.forEach(cat => {
+                categorySelect.add(new Option(cat, cat));
+            });
+
+            statuts.forEach(statut => {
+                statusSelect.add(new Option(statut, statut));
+            });
+
+            priorites.forEach(priorite => {
+                prioritySelect.add(new Option(priorite, priorite));
+            });
+        }
+
+        // Événements des filtres
+        document.querySelectorAll('select, input[type="date"]').forEach(element => {
+            element.addEventListener('change', () => {
+                const filters = {
+                    startDate: document.getElementById('startDate').value,
+                    endDate: document.getElementById('endDate').value,
+                    category: document.getElementById('categoryFilter').value,
+                    status: document.getElementById('statusFilter').value,
+                    priority: document.getElementById('priorityFilter').value
+                };
+
+                // Appliquer les filtres et mettre à jour l'interface
+                fetch(`load.php?${new URLSearchParams(filters)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        updateKPIs(data);
+                        updateCharts(data);
+                        updateProjectsList(data);
+                    });
+            });
+        });
+
+        // Chargement initial des données
+        loadData();
     </script>
 </body>
 
