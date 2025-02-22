@@ -1,7 +1,7 @@
 
 ### **Amélioration du `README.md` :**
 
-```markdown
+
 # 📊 **Tableau de Bord de Gestion de Projets**
 
 Un système moderne et intuitif pour gérer et suivre vos projets. Ce tableau de bord interactif est conçu avec **PHP**, **MySQL**, et **JavaScript** pour offrir une expérience utilisateur optimale.

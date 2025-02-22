@@ -11,13 +11,5 @@
             "email": "158610374+digitaleflex@users.noreply.github.com"
         }
     ],
-    "config": {
-        "platform": {
-            "php": "7.4"
-        }
-    },
-    "require": {
-        "tecnickcom/tcpdf": "6.8",
-        "phpoffice/phpspreadsheet": "1.28.0"
-    }
+    "require": {}
 }
