@@ -1,4 +1,8 @@
 <?php
+ob_start(); // Démarrer la mise en mémoire tampon
+error_reporting(0);
+ini_set('display_errors', 0);
+
 header('Content-Type: application/json');
 
 class DatabaseConnection {
@@ -13,7 +17,7 @@ class DatabaseConnection {
             $this->conn = new PDO("mysql:host=$this->host;dbname=$this->db", $this->user, $this->password);
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
-            echo "Erreur de connexion : " . $e->getMessage();
+            throw new Exception("Erreur de connexion : " . $e->getMessage());
         }
     }
 }
@@ -26,18 +30,22 @@ class ProjectManager {
     }
 
     public function getProjects() {
-        $query = "
-            SELECT p.*, c.nom as categorie_nom, c.couleur,
-            COUNT(DISTINCT pm.membre_id) as nombre_membres
-            FROM projets p
-            LEFT JOIN categories c ON p.categorie_id = c.id
-            LEFT JOIN projet_membres pm ON p.id = pm.projet_id
-            GROUP BY p.id
-        ";
-        
-        $stmt = $this->db->conn->prepare($query);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            $query = "
+                SELECT p.*, c.nom as categorie_nom, c.couleur,
+                COUNT(DISTINCT pm.membre_id) as nombre_membres
+                FROM projets p
+                LEFT JOIN categories c ON p.categorie_id = c.id
+                LEFT JOIN projet_membres pm ON p.id = pm.projet_id
+                GROUP BY p.id
+            ";
+            
+            $stmt = $this->db->conn->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return ['error' => $e->getMessage()];
+        }
     }
 
     public function getProjectStats() {
@@ -115,43 +123,74 @@ class ProjectManager {
 
     public function updateProject($data) {
         try {
-            // Validation des données
-            if (!isset($data['project_id']) || !isset($data['nom_projet'])) {
-                return ['success' => false, 'error' => 'Données manquantes'];
+            // Vérifier si l'ID est présent
+            if (!isset($data['id']) && !isset($data['project_id'])) {
+                return ['success' => false, 'error' => 'ID du projet manquant'];
             }
 
-            $progression = intval($data['progression']);
-            if ($progression < 0 || $progression > 100) {
-                return ['success' => false, 'error' => 'Progression invalide'];
+            // Utiliser project_id si id n'est pas défini
+            $projectId = $data['id'] ?? $data['project_id'];
+
+            // Construire la requête SQL dynamiquement
+            $updateFields = [];
+            $params = [];
+            
+            // Mettre à jour uniquement les champs fournis
+            if (isset($data['statut'])) {
+                $updateFields[] = 'statut = ?';
+                $params[] = $data['statut'];
+            }
+            if (isset($data['nom_projet'])) {
+                $updateFields[] = 'nom_projet = ?';
+                $params[] = $data['nom_projet'];
+            }
+            if (isset($data['description'])) {
+                $updateFields[] = 'description = ?';
+                $params[] = $data['description'];
+            }
+            if (isset($data['budget'])) {
+                $updateFields[] = 'budget = ?';
+                $params[] = floatval($data['budget']);
+            }
+            if (isset($data['progression'])) {
+                $updateFields[] = 'progression = ?';
+                $params[] = intval($data['progression']);
+            }
+            if (isset($data['date_creation'])) {
+                $updateFields[] = 'date_creation = ?';
+                $params[] = $data['date_creation'];
+            }
+            if (isset($data['date_fin'])) {
+                $updateFields[] = 'date_fin = ?';
+                $params[] = $data['date_fin'];
+            }
+            if (isset($data['priorite'])) {
+                $updateFields[] = 'priorite = ?';
+                $params[] = $data['priorite'];
+            }
+            if (isset($data['categorie_id'])) {
+                $updateFields[] = 'categorie_id = ?';
+                $params[] = $data['categorie_id'];
             }
 
-            $query = "UPDATE projets SET 
-                nom_projet = :nom_projet,
-                description = :description,
-                date_creation = :date_creation,
-                date_fin = :date_fin,
-                categorie_id = :categorie_id,
-                priorite = :priorite,
-                statut = :statut,
-                progression = :progression,
-                budget = :budget
-                WHERE id = :id";
+            // Si aucun champ à mettre à jour
+            if (empty($updateFields)) {
+                return ['success' => false, 'error' => 'Aucune donnée à mettre à jour'];
+            }
 
-            $stmt = $this->db->conn->prepare($query);
-            $result = $stmt->execute([
-                'id' => $data['project_id'],
-                'nom_projet' => $data['nom_projet'],
-                'description' => $data['description'],
-                'date_creation' => $data['date_creation'],
-                'date_fin' => $data['date_fin'],
-                'categorie_id' => $data['categorie_id'],
-                'priorite' => $data['priorite'],
-                'statut' => $data['statut'],
-                'progression' => $progression,
-                'budget' => floatval($data['budget'])
-            ]);
+            // Ajouter l'ID à la fin des paramètres
+            $params[] = $projectId;
 
-            return ['success' => $result];
+            // Construire et exécuter la requête
+            $sql = "UPDATE projets SET " . implode(', ', $updateFields) . " WHERE id = ?";
+            $stmt = $this->db->conn->prepare($sql);
+            $stmt->execute($params);
+
+            if ($stmt->rowCount() > 0) {
+                return ['success' => true];
+            } else {
+                return ['success' => false, 'error' => 'Aucune modification effectuée'];
+            }
         } catch (PDOException $e) {
             return ['success' => false, 'error' => $e->getMessage()];
         }
@@ -174,30 +213,80 @@ class ProjectManager {
             return ['success' => false, 'error' => $e->getMessage()];
         }
     }
+
+    public function exportData() {
+        try {
+            // Récupérer les projets avec leurs détails
+            $query = "
+                SELECT 
+                    p.*,
+                    c.nom as categorie_nom,
+                    c.couleur,
+                    GROUP_CONCAT(DISTINCT m.nom) as membres,
+                    COUNT(DISTINCT t.id) as nombre_taches,
+                    COUNT(DISTINCT com.id) as nombre_commentaires
+                FROM projets p
+                LEFT JOIN categories c ON p.categorie_id = c.id
+                LEFT JOIN projet_membres pm ON p.id = pm.projet_id
+                LEFT JOIN membres m ON pm.membre_id = m.id
+                LEFT JOIN taches t ON p.id = t.projet_id
+                LEFT JOIN commentaires com ON p.id = com.projet_id
+                GROUP BY p.id
+            ";
+            
+            $stmt = $this->db->conn->prepare($query);
+            $stmt->execute();
+            $projets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Ajouter des métadonnées
+            $export = [
+                'date_export' => date('Y-m-d H:i:s'),
+                'nombre_projets' => count($projets),
+                'projets' => $projets
+            ];
+
+            return $export;
+        } catch (PDOException $e) {
+            return ['error' => $e->getMessage()];
+        }
+    }
 }
 
+// Ne rien afficher directement, tout passer par json_encode
 $database = new DatabaseConnection();
 $projectManager = new ProjectManager($database);
 
 $action = $_GET['action'] ?? 'projects';
+$result = [];
 
 switch($action) {
     case 'stats':
-        echo json_encode($projectManager->getProjectStats());
+        $result = $projectManager->getProjectStats();
         break;
     case 'categories':
-        echo json_encode($projectManager->getCategories());
+        $result = $projectManager->getCategories();
         break;
     case 'add_project':
-        echo json_encode($projectManager->addProject($_POST));
+        $result = $projectManager->addProject($_POST);
         break;
     case 'update_project':
-        echo json_encode($projectManager->updateProject($_POST));
+        $data = $_POST;
+        // Vérifier si l'ID est présent dans l'URL
+        if (isset($_GET['id'])) {
+            $data['id'] = $_GET['id'];
+        }
+        $result = $projectManager->updateProject($data);
         break;
     case 'delete_project':
-        echo json_encode($projectManager->deleteProject($_GET['id']));
+        $result = $projectManager->deleteProject($_GET['id']);
+        break;
+    case 'export':
+        $result = $projectManager->exportData();
         break;
     default:
-        echo json_encode($projectManager->getProjects());
+        $result = $projectManager->getProjects();
 }
+
+echo json_encode($result);
+exit;
 ?>

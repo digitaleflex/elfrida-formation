@@ -1,1 +1,15 @@
- 
+{
+    "name": "lumen/jour7",
+    "autoload": {
+        "psr-4": {
+            "Lumen\\Jour7\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Eflex",
+            "email": "158610374+digitaleflex@users.noreply.github.com"
+        }
+    ],
+    "require": {}
+}

@@ -1,8 +1,6 @@
-Pour améliorer l'apparence de ton `README.md` et le rendre encore plus structuré et agréable à lire, voici une version optimisée avec des sections bien définies, des titres hiérarchisés et une meilleure lisibilité visuelle. J'ai ajouté quelques éléments comme des emojis, des blocs de code plus détaillés et des sections plus visibles.
 
 ### **Amélioration du `README.md` :**
 
-```markdown
 # 📊 **Tableau de Bord de Gestion de Projets**
 
 Un système moderne et intuitif pour gérer et suivre vos projets. Ce tableau de bord interactif est conçu avec **PHP**, **MySQL**, et **JavaScript** pour offrir une expérience utilisateur optimale.
@@ -12,6 +10,7 @@ Un système moderne et intuitif pour gérer et suivre vos projets. Ce tableau de
 ## 🌟 **Fonctionnalités Principales**
 
 ### 1. 📈 **Tableau de Bord Analytique**
+
 - **Vue d'ensemble** des KPIs (Indicateurs Clés de Performance)
 - Nombre total de projets
 - **Budget total** en F CFA
@@ -19,12 +18,14 @@ Un système moderne et intuitif pour gérer et suivre vos projets. Ce tableau de
 - Nombre de projets **en cours**
 
 ### 2. 📊 **Visualisations Graphiques**
+
 - **Graphique circulaire** pour la répartition des statuts
 - **Graphique en barres** de progression par catégorie
 - Graphiques interactifs avec animations
 - Mise à jour **en temps réel**
 
 ### 3. ⚡ **Gestion des Projets**
+
 - **Création** de nouveaux projets
 - **Modification** des projets existants
 - **Suppression** avec confirmation
@@ -32,6 +33,7 @@ Un système moderne et intuitif pour gérer et suivre vos projets. Ce tableau de
 - Gestion des **statuts** (En cours, Terminé, Annulé)
 
 ### 4. 🎨 **Interface Utilisateur**
+
 - Design **moderne** et **responsive**
 - Thème **clair/sombre**
 - Notifications **toast animées**
@@ -39,10 +41,12 @@ Un système moderne et intuitif pour gérer et suivre vos projets. Ce tableau de
 - Modales **interactives**
 
 ### 5. 🔍 **Filtres et Recherche**
+
 - Filtrage par **date**, **catégorie**, **statut**, **priorité**
 - **Recherche** en temps réel
 
 ### 6. 📋 **Fonctionnalités Avancées**
+
 - **Export PDF/Excel**
 - Vue **Kanban** des projets
 - Système de **notifications**
@@ -54,6 +58,7 @@ Un système moderne et intuitif pour gérer et suivre vos projets. Ce tableau de
 ## 🛠️ **Technologies Utilisées**
 
 ### **Frontend:**
+
 - **HTML5** / **CSS3**
 - **JavaScript** (Vanilla)
 - **Tailwind CSS**
@@ -61,6 +66,7 @@ Un système moderne et intuitif pour gérer et suivre vos projets. Ce tableau de
 - **Font Awesome** pour les icônes
 
 ### **Backend:**
+
 - **PHP** (avec PDO)
 - **MySQL** pour la gestion des données
 
@@ -83,27 +89,34 @@ Voici la structure des principales tables utilisées dans la base de données :
 ## 🚀 **Installation**
 
 ### 1. **Cloner le Repository**
+
 ```bash
-git clone [url-du-repo]
+git clone https://github.com/digitaleflex/elfrida-formation.git 
 ```
 
 ### 2. **Importer la Base de Données**
+
 Importe le fichier SQL dans ton serveur MySQL :
+
 ```bash
 mysql -u [utilisateur] -p [nom_de_la_base] < gestion_projets.sql
 ```
 
 ### 3. **Configurer la Connexion à la Base de Données**
+
 Modifie les paramètres de connexion dans le fichier `load.php` :
+
 ```php
 private $host = 'localhost';
 private $db = 'gestion_projets';
-private $user = 'votre_utilisateur';
-private $password = 'votre_mot_de_passe';
+private $user = 'root';
+private $password = '';
 ```
 
 ### 4. **Lancer le Serveur PHP**
+
 Lance le serveur local en utilisant la commande suivante :
+
 ```bash
 php -S localhost:8000
 ```
@@ -113,22 +126,26 @@ php -S localhost:8000
 ## 💡 **Fonctionnalités Détaillées**
 
 ### **Gestion des Projets**
+
 - **Création** de projets avec des champs détaillés
 - **Modification** de projets existants avec suivi des progrès
 - **Suppression** sécurisée avec confirmation
 - **Suivi de la progression** via une barre visuelle
 
 ### **Système de Notifications**
+
 - **Toast animées** pour les notifications
 - Alertes de **confirmation**, **erreur** et **mises à jour**
 - Notifications de projet **mises à jour en temps réel**
 
 ### **Filtres Avancés**
+
 - **Filtrage multi-critères** : par date, catégorie, statut, etc.
 - Mise à jour **dynamique** des données
 - Interface intuitive avec possibilité de **réinitialiser** les filtres
 
 ### **Export de Données**
+
 - **Export au format PDF** et **Excel**
 - **Sélection de données** à exporter
 - Mise en forme personnalisée
@@ -169,10 +186,7 @@ php -S localhost:8000
 
 ## 👥 **Contributeurs**
 
-- **DIALLO Mamadou Dian**
-- **DIALLO Mamadou Saliou**
-- **DIALLO Mamadou Aliou**
-- **DIALLO Mamadou Cellou**
+- **DIGITALE FLEX**
 
 ---
 
@@ -180,13 +194,14 @@ php -S localhost:8000
 
 MIT License
 
-Copyright (c) 2024 **DIALLO Mamadou Dian**
+Copyright (c) 2024 **EURIN HASH**
 
 La permission est accordée, sans frais, à toute personne obtenant une copie du présent logiciel et des fichiers de documentation associés (le "Logiciel"), de traiter le Logiciel sans restriction, y compris sans limitation les droits de l'utiliser, de le copier, de le modifier, de le fusionner, de le publier, de le distribuer, de sous-licencier et/ou de vendre des copies du Logiciel, et de permettre à des personnes auxquelles le Logiciel est fourni de le faire, sous réserve des conditions suivantes :
 
 Le présent avis de droit d'auteur et cet avis de permission doivent être inclus dans toutes les copies ou portions substantielles du Logiciel.
 
 LE LOGICIEL EST FOURNI "EN L'ÉTAT", SANS AUCUNE GARANTIE D'AUCUNE SORTE, EXPRESSE OU IMPLICITE, Y COMPRIS MAIS SANS S'Y LIMITER LES GARANTIES DE COMMERCIALISATION, D'ADAPTATION À UN USAGE PARTICULIER ET DE NON-VIOLATION. EN AUCUN CAS LES AUTEURS OU LES DÉTENTEURS DU DROIT D'AUTEUR NE POURRONT ÊTRE TENUS RESPONSABLES DE QUELQUE RECLAMATION, DOMMAGES OU AUTRE RESPONSABILITÉ, QU'IL S'AGISSE D'UNE ACTION EN CONTRAT, DÉLIT OU AUTRE, DÉCOULANT DE, OU EN RELATION AVEC, LE LOGICIEL OU L'UTILISATION OU AUTRES TRANSACTIONS DANS LE LOGICIEL.
+
 ```
 
 ---
@@ -197,4 +212,3 @@ LE LOGICIEL EST FOURNI "EN L'ÉTAT", SANS AUCUNE GARANTIE D'AUCUNE SORTE, EXPRES
 3. **Ajout de visuels** : Utilisation d'emojis pour rendre chaque fonctionnalité plus attrayante visuellement.
 4. **Éléments détaillés** : Les sections de "Fonctionnalités Détaillées" et "Sécurité" sont ajoutées pour donner une vision claire de ce que le projet implémente et comment il est sécurisé.
 
-Avec ce format, ton `README.md` est à la fois structuré, informatif et agréable à lire !
