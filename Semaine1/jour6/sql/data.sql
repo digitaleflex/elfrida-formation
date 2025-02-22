@@ -20,7 +20,8 @@ INSERT INTO patients (nom, prenom, telephone, email) VALUES
 ('Berger', 'Hélène', '0756789012', 'helene.berger@example.com'),
 ('Simon', 'Eric', '0767890123', 'eric.simon@example.com'),
 ('Leclerc', 'Chloé', '0778901234', 'chloe.leclerc@example.com'),
-('Dufresne', 'Gabriel', '0789012345', 'gabriel.dufresne@example.com');
+('Dufresne', 'Gabriel', '0789012345', 'gabriel.dufresne@example.com'),
+('Lemoine', 'Isabelle', '0790123456', 'isabelle.lemoine@example.com');
 
 -- Insertion des rendez-vous
 -- Patient 1 : Jean Dupont
