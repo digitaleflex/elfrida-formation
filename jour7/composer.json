@@ -1,1 +1,23 @@
- 
+{
+    "name": "lumen/jour7",
+    "autoload": {
+        "psr-4": {
+            "Lumen\\Jour7\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Eflex",
+            "email": "158610374+digitaleflex@users.noreply.github.com"
+        }
+    ],
+    "config": {
+        "platform": {
+            "php": "7.4"
+        }
+    },
+    "require": {
+        "tecnickcom/tcpdf": "6.8",
+        "phpoffice/phpspreadsheet": "1.28.0"
+    }
+}

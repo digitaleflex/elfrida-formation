@@ -1,4 +1,3 @@
-Pour améliorer l'apparence de ton `README.md` et le rendre encore plus structuré et agréable à lire, voici une version optimisée avec des sections bien définies, des titres hiérarchisés et une meilleure lisibilité visuelle. J'ai ajouté quelques éléments comme des emojis, des blocs de code plus détaillés et des sections plus visibles.
 
 ### **Amélioration du `README.md` :**
 
@@ -84,7 +83,7 @@ Voici la structure des principales tables utilisées dans la base de données :
 
 ### 1. **Cloner le Repository**
 ```bash
-git clone [url-du-repo]
+git clone https://github.com/digitaleflex/elfrida-formation.git 
 ```
 
 ### 2. **Importer la Base de Données**
@@ -98,8 +97,8 @@ Modifie les paramètres de connexion dans le fichier `load.php` :
 ```php
 private $host = 'localhost';
 private $db = 'gestion_projets';
-private $user = 'votre_utilisateur';
-private $password = 'votre_mot_de_passe';
+private $user = 'root';
+private $password = '';
 ```
 
 ### 4. **Lancer le Serveur PHP**
@@ -169,10 +168,8 @@ php -S localhost:8000
 
 ## 👥 **Contributeurs**
 
-- **DIALLO Mamadou Dian**
-- **DIALLO Mamadou Saliou**
-- **DIALLO Mamadou Aliou**
-- **DIALLO Mamadou Cellou**
+- **DIGITALE FLEX**
+
 
 ---
 
@@ -180,7 +177,7 @@ php -S localhost:8000
 
 MIT License
 
-Copyright (c) 2024 **DIALLO Mamadou Dian**
+Copyright (c) 2024 **EURIN HASH**
 
 La permission est accordée, sans frais, à toute personne obtenant une copie du présent logiciel et des fichiers de documentation associés (le "Logiciel"), de traiter le Logiciel sans restriction, y compris sans limitation les droits de l'utiliser, de le copier, de le modifier, de le fusionner, de le publier, de le distribuer, de sous-licencier et/ou de vendre des copies du Logiciel, et de permettre à des personnes auxquelles le Logiciel est fourni de le faire, sous réserve des conditions suivantes :
 
@@ -197,4 +194,3 @@ LE LOGICIEL EST FOURNI "EN L'ÉTAT", SANS AUCUNE GARANTIE D'AUCUNE SORTE, EXPRES
 3. **Ajout de visuels** : Utilisation d'emojis pour rendre chaque fonctionnalité plus attrayante visuellement.
 4. **Éléments détaillés** : Les sections de "Fonctionnalités Détaillées" et "Sécurité" sont ajoutées pour donner une vision claire de ce que le projet implémente et comment il est sécurisé.
 
-Avec ce format, ton `README.md` est à la fois structuré, informatif et agréable à lire !

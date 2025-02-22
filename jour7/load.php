@@ -1,4 +1,8 @@
 <?php
+ob_start(); // Démarrer la mise en mémoire tampon
+error_reporting(0);
+ini_set('display_errors', 0);
+
 header('Content-Type: application/json');
 
 class DatabaseConnection {
@@ -13,7 +17,7 @@ class DatabaseConnection {
             $this->conn = new PDO("mysql:host=$this->host;dbname=$this->db", $this->user, $this->password);
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
-            echo "Erreur de connexion : " . $e->getMessage();
+            throw new Exception("Erreur de connexion : " . $e->getMessage());
         }
     }
 }
@@ -26,18 +30,22 @@ class ProjectManager {
     }
 
     public function getProjects() {
-        $query = "
-            SELECT p.*, c.nom as categorie_nom, c.couleur,
-            COUNT(DISTINCT pm.membre_id) as nombre_membres
-            FROM projets p
-            LEFT JOIN categories c ON p.categorie_id = c.id
-            LEFT JOIN projet_membres pm ON p.id = pm.projet_id
-            GROUP BY p.id
-        ";
-        
-        $stmt = $this->db->conn->prepare($query);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            $query = "
+                SELECT p.*, c.nom as categorie_nom, c.couleur,
+                COUNT(DISTINCT pm.membre_id) as nombre_membres
+                FROM projets p
+                LEFT JOIN categories c ON p.categorie_id = c.id
+                LEFT JOIN projet_membres pm ON p.id = pm.projet_id
+                GROUP BY p.id
+            ";
+            
+            $stmt = $this->db->conn->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return ['error' => $e->getMessage()];
+        }
     }
 
     public function getProjectStats() {
@@ -176,28 +184,33 @@ class ProjectManager {
     }
 }
 
+// Ne rien afficher directement, tout passer par json_encode
 $database = new DatabaseConnection();
 $projectManager = new ProjectManager($database);
 
 $action = $_GET['action'] ?? 'projects';
+$result = [];
 
 switch($action) {
     case 'stats':
-        echo json_encode($projectManager->getProjectStats());
+        $result = $projectManager->getProjectStats();
         break;
     case 'categories':
-        echo json_encode($projectManager->getCategories());
+        $result = $projectManager->getCategories();
         break;
     case 'add_project':
-        echo json_encode($projectManager->addProject($_POST));
+        $result = $projectManager->addProject($_POST);
         break;
     case 'update_project':
-        echo json_encode($projectManager->updateProject($_POST));
+        $result = $projectManager->updateProject($_POST);
         break;
     case 'delete_project':
-        echo json_encode($projectManager->deleteProject($_GET['id']));
+        $result = $projectManager->deleteProject($_GET['id']);
         break;
     default:
-        echo json_encode($projectManager->getProjects());
+        $result = $projectManager->getProjects();
 }
+
+echo json_encode($result);
+exit;
 ?>
