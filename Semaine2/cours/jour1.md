@@ -1,6 +1,4 @@
-Voici un cours détaillé et pédagogique sur la **Programmation Orientée Objet (POO) en PHP**, conçu pour être captivant et facile à comprendre.  
 
----
 
 # **🚀 Jour 1 : Programmation Orientée Objet (POO) en PHP**  
 ## **🎯 Objectifs du jour :**  

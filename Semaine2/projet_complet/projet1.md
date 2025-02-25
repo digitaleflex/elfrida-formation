@@ -1,6 +1,4 @@
-D'accord, voici le projet réajusté pour qu'il soit encore plus réaliste et immersif, avec un contexte d’entreprise fictive détaillé et des exigences supplémentaires pour donner aux étudiants une meilleure immersion dans une situation de développement en entreprise.
 
----
 
 # **Projet : Système de Gestion de Commandes pour E-commerce**
 
